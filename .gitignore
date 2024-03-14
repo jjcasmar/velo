@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+
+# VSCode stuff
+.vscode/
+velo.code-workspace
+
+.conan
+.conan2
+.cache
+.devcontainer
+build
+compile_commands.json
+ConanPresets.json
+
+

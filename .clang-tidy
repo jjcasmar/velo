@@ -1,0 +1,53 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  cppcoreguidelines-*,
+  google-build-using-namespace,
+  google-global-names-in-headers,
+  hicpp-*,
+  llvm-include-order,
+  misc-*,
+  modernize-*,
+  openmp-*,
+  performance-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-union-access,
+  -hicpp-no-array-decay,
+  -misc-no-recursion,
+  -modernize-pass-by-value,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  # The following checks generate a lot of noise with asserts
+# -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+# -hicpp-no-array-decay
+
+WarningsAsErrors: ""
+HeaderFilterRegex: ""
+FormatStyle: file
+CheckOptions:
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: modernize-use-auto.MinTypeNameLength
+    value: 0
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 1
+  - key: misc-non-private-member-variables-in-classes.IgnorePublicMemberVariables
+    value: 1
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: 1
+  - key: hicpp-special-member-functions.AllowSoleDefaultDtor
+    value: 1
+  - key: modernize-use-override.IgnoreDestructors
+    value: 1
