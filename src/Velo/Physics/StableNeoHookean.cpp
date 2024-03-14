@@ -1,17 +1,14 @@
-#include <Velo/Physics/StVK.h>
+#include <Velo/Physics/StableNeoHookean.h>
 
 #include <Velo/Core/Space.h>
 #include <Velo/Physics/State.h>
 
 #include <Eigen/Core>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
-
 namespace velo::constraints
 {
 
-void initialize(StVK &constraints, MechanicalState<velo::Space3D, velo::Space3D>::RestPoseT &x0)
+void initialize(StableNeoHookean &constraints, MechanicalState<velo::Space3D, velo::Space3D>::RestPoseT &x0)
 {
     constraints.invDm.resize(constraints.indices.size());
     constraints.dFdx.resize(constraints.indices.size());
@@ -87,7 +84,7 @@ void initialize(StVK &constraints, MechanicalState<velo::Space3D, velo::Space3D>
     }
 }
 
-void correction(const StVK &constraints,
+void correction(const StableNeoHookean &constraints,
                 int nbIterations,
                 float dt,
                 MechanicalState<velo::Space3D, velo::Space3D> &state)
@@ -131,13 +128,15 @@ void correction(const StVK &constraints,
 
             const Eigen::Matrix3f F = (poseMatrix * constraints.invDm[cId]);
 
-            const auto cH = 0.5 * ((F.transpose() * F).trace() - 3);
-            const auto &dcHdF = F;
+            const auto cH = F.determinant() - (1 + constraints.mu[cId] / constraints.lambda[cId]);
+            auto dcHdF = Eigen::Matrix3f::Zero().eval();
+            dcHdF.col(0) = F.col(1).cross(F.col(2));
+            dcHdF.col(1) = F.col(2).cross(F.col(0));
+            dcHdF.col(2) = F.col(0).cross(F.col(1));
             const auto dcHdx = (constraints.dFdx[cId].transpose() * dcHdF.reshaped()).eval();
 
-            const auto E = (0.5 * (F.transpose() * F - Eigen::Matrix3f::Identity())).eval();
-            const auto cD = std::sqrt((E * E).trace());
-            const auto &dcDdF = ((1.0 / (2 * (cD + 1e-8))) * (F * F.transpose() * F - F)).eval();
+            const auto cD = std::sqrt((F.transpose() * F).trace());
+            const auto &dcDdF = ((1.0 / (cD + 1e-8)) * F).eval();
             const auto dcDdx = (constraints.dFdx[cId].transpose() * dcDdF.reshaped()).eval();
 
             auto c = Eigen::Matrix<float, 2, 1>{cH, cD};
@@ -147,7 +146,7 @@ void correction(const StVK &constraints,
             dC.block<1, 12>(1, 0) = dcDdx;
 
             const float alphaH = 1.0F / (constraints.volumes[cId] * constraints.lambda[cId] * dt * dt);
-            const float alphaD = 1.0F / (constraints.volumes[cId] * 2 * constraints.mu[cId] * dt * dt);
+            const float alphaD = 1.0F / (constraints.volumes[cId] * constraints.mu[cId] * dt * dt);
 
             Eigen::Matrix2f alpha{{alphaH, 0}, {0, alphaD}};
 

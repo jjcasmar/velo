@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("/workspace/build/dev-debug/lib")
+sys.path.append("/workspace/build/dev-release/lib")
 
 import PyVelo
 import numpy as np
@@ -8,34 +8,47 @@ import meshio
 
 mesh = meshio.read("beam.msh")
 
-beam = PyVelo.MechanicalState33D()
-# beam.x0 = mesh.points
-beam.x0 = np.array([[0,0,0],[1,0,0], [0,1,0], [0,0,1]])
-beam.x = beam.x0
+beam_stvk = PyVelo.MechanicalState33D()
+beam_stvk.x0 = mesh.points
+beam_stvk.x = beam_stvk.x0
 
-npoints = beam.x0.shape[0]
+beam_snh = PyVelo.MechanicalState33D()
+beam_snh.x0 = mesh.points
+beam_snh.x = beam_snh.x0
 
-beam.v = np.zeros((npoints, 3))
-beam.mass = np.ones((npoints, 1))
+npoints = beam_stvk.x0.shape[0]
+
+beam_stvk.v = np.zeros((npoints, 3))
+beam_stvk.mass = np.ones((npoints, 1))
+beam_snh.v = np.zeros((npoints, 3))
+beam_snh.mass = np.ones((npoints, 1))
 fixed = np.zeros((npoints), dtype="i4")
 
 # Fix some points
-# for i, p in enumerate(beam.x0):
-#     if p[2] < 0.9:
-#         fixed[i] = 1
-fixed[0] = 1
+for i, p in enumerate(beam_stvk.x0):
+    if p[0] < 0.1:
+        fixed[i] = 1
 
-beam.fixed = fixed.tolist()
+beam_stvk.fixed = fixed.tolist()
+beam_snh.fixed = fixed.tolist()
 
 stvk = PyVelo.StVK()
-stvk.indices = [[0,1,2,3]]
-#mesh.get_cells_type("tetra")
+snh = PyVelo.StableNeoHookean()
+indices = mesh.get_cells_type("tetra")
+stvk.indices = indices
+snh.indices = indices
 
-stvk.init(beam.x0)
+stvk.init(beam_stvk.x0)
+snh.init(beam_snh.x0)
 
-for i in range(1000):
-    PyVelo.step(0.01, 2000, beam, stvk)
-    mesh = meshio.Mesh(beam.x, [("tetra", [[0,1,2,3]])])
-    meshio.write(f"cube{i:03}.vtu", mesh)
+for i in range(100):
+    PyVelo.step(0.1, 100, 10, beam_stvk, stvk)
+    PyVelo.step(0.1, 100, 10, beam_snh, snh)
+    mesh.points = beam_stvk.x
+    meshio.write(f"beam_stvk_100_10_{i}.vtu", mesh)
+
+    mesh.points = beam_snh.x
+    meshio.write(f"beam_snh_100_10_{i}.vtu", mesh)
+
 
 

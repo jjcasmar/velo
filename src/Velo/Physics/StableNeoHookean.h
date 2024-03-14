@@ -1,5 +1,5 @@
-#ifndef VELO_PHYSICS_STVKCONSTRAINT_H
-#define VELO_PHYSICS_STVKCONSTRAINT_H
+#ifndef VELO_PHYSICS_SNH_H
+#define VELO_PHYSICS_SNH_H
 
 #include <Eigen/Dense>
 #include <Velo/Core/Space.h>
@@ -9,7 +9,7 @@
 
 namespace velo::constraints
 {
-struct StVK {
+struct StableNeoHookean {
     std::vector<std::array<int, 4>> indices;
 
     // These are helpers, they should only be modified by the initialization
@@ -22,14 +22,15 @@ struct StVK {
     std::vector<float> mu;
 };
 
-void VELOPHYSICS_EXPORT initialize(StVK &constraints, MechanicalState<velo::Space3D, velo::Space3D>::RestPoseT &x0);
+void VELOPHYSICS_EXPORT initialize(StableNeoHookean &constraints,
+                                   MechanicalState<velo::Space3D, velo::Space3D>::RestPoseT &x0);
 
 // TODO This should only return the constraint and gradient
-void VELOPHYSICS_NO_EXPORT correction(const StVK &constraints,
+void VELOPHYSICS_NO_EXPORT correction(const StableNeoHookean &constraints,
                                       int nbIterations,
                                       float dt,
                                       MechanicalState<velo::Space3D, velo::Space3D> &state);
 
 }  // namespace velo::constraints
 
-#endif  // VELO_PHYSICS_STVKCONSTRAINT_H
+#endif  //  VELO_PHYSICS_SNH_H

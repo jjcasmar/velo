@@ -2,6 +2,7 @@ set(HEADERS
   State.h
   xpbd.h
   StVK.h
+  StableNeoHookean.h
 )
 
 set(PUBLIC_HEADERS)
@@ -9,6 +10,7 @@ set(PUBLIC_HEADERS)
 set(SOURCES
   xpbd.cpp
   StVK.cpp
+  StableNeoHookean.cpp
 )
 
 add_library(VeloPhysics ${HEADERS} ${SOURCES} ${PUBLIC_HEADERS})
