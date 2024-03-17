@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.23)
 project(Velo LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Eigen3 REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(HighFive REQUIRED)
+find_package(EnTT REQUIRED)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)

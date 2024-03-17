@@ -1,6 +1,7 @@
 set(HEADERS
-  State.h
+  MechanicalState.h
   xpbd.h
+  Energy.h
   StVK.h
   StableNeoHookean.h
 )
@@ -9,6 +10,7 @@ set(PUBLIC_HEADERS)
 
 set(SOURCES
   xpbd.cpp
+  Energy.cpp
   StVK.cpp
   StableNeoHookean.cpp
 )
